@@ -46,33 +46,44 @@ class AuthViewModel(
     }
 
     fun registerWithEmail(email: String, password: String, confirmPassword: String) {
+        android.util.Log.d("AuthViewModel", "registerWithEmail called with email: $email")
+
         if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+            android.util.Log.d("AuthViewModel", "Validation failed: empty fields")
             _authState.value = AuthState.Error("Por favor completa todos los campos")
             return
         }
 
         if (!isValidEmail(email)) {
+            android.util.Log.d("AuthViewModel", "Validation failed: invalid email")
             _authState.value = AuthState.Error("Correo electrónico inválido")
             return
         }
 
         if (password.length < 8) {
+            android.util.Log.d("AuthViewModel", "Validation failed: password too short")
             _authState.value = AuthState.Error("La contraseña debe tener al menos 8 caracteres")
             return
         }
 
         if (password != confirmPassword) {
+            android.util.Log.d("AuthViewModel", "Validation failed: passwords don't match")
             _authState.value = AuthState.Error("Las contraseñas no coinciden")
             return
         }
 
+        android.util.Log.d("AuthViewModel", "All validations passed, starting registration")
+
         viewModelScope.launch {
+            android.util.Log.d("AuthViewModel", "Setting loading state")
             _authState.value = AuthState.Loading
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
+            android.util.Log.d("AuthViewModel", "Calling firebaseManager.registerWithEmail")
             val result = firebaseManager.registerWithEmail(email, password)
 
             result.onSuccess { user ->
+                android.util.Log.d("AuthViewModel", "Registration successful: ${user.uid}")
                 preferencesManager.setLoggedIn(true)
                 preferencesManager.setUserId(user.uid)
 
@@ -82,6 +93,7 @@ class AuthViewModel(
                     isLoggedIn = true
                 )
             }.onFailure { error ->
+                android.util.Log.e("AuthViewModel", "Registration failed", error)
                 val errorMessage = getErrorMessage(error)
                 _authState.value = AuthState.Error(errorMessage)
                 _uiState.value = _uiState.value.copy(
@@ -93,6 +105,7 @@ class AuthViewModel(
     }
 
     fun loginWithEmail(email: String, password: String) {
+        // Validaciones
         if (email.isBlank() || password.isBlank()) {
             _authState.value = AuthState.Error("Por favor completa todos los campos")
             return
@@ -119,6 +132,38 @@ class AuthViewModel(
                     isLoggedIn = true
                 )
             }.onFailure { error ->
+                val errorMessage = getErrorMessage(error)
+                _authState.value = AuthState.Error(errorMessage)
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = errorMessage
+                )
+            }
+        }
+    }
+
+    fun loginWithGoogle(context: android.content.Context) {
+        viewModelScope.launch {
+            android.util.Log.d("AuthViewModel", "Starting Google Sign In")
+            _authState.value = AuthState.Loading
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
+            val serverClientId = "576830420088-oq4adid53gidnub1n5sto6rg7sbluf90.apps.googleusercontent.com"
+
+            val result = firebaseManager.loginWithGoogle(context, serverClientId)
+
+            result.onSuccess { user ->
+                android.util.Log.d("AuthViewModel", "Google Sign In successful: ${user.uid}")
+                preferencesManager.setLoggedIn(true)
+                preferencesManager.setUserId(user.uid)
+
+                _authState.value = AuthState.Success(user.uid)
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    isLoggedIn = true
+                )
+            }.onFailure { error ->
+                android.util.Log.e("AuthViewModel", "Google Sign In failed", error)
                 val errorMessage = getErrorMessage(error)
                 _authState.value = AuthState.Error(errorMessage)
                 _uiState.value = _uiState.value.copy(

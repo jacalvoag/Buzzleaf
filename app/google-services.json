@@ -12,7 +12,20 @@
           "package_name": "com.buzzleaf"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "576830420088-s6tf3mtjbgnkgpb35ipq4egfnft1ejkp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.buzzleaf",
+            "certificate_hash": "779b5b5cabe187316c7844d75a51f7d34aadacd0"
+          }
+        },
+        {
+          "client_id": "576830420088-oq4adid53gidnub1n5sto6rg7sbluf90.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBqUSO5a1sMB1YZ-MikH0rZDjIWib4Ibn8"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "576830420088-oq4adid53gidnub1n5sto6rg7sbluf90.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
