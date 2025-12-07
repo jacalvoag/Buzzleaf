@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "576830420088",
+    "project_id": "buzzleaf-bbaf6",
+    "storage_bucket": "buzzleaf-bbaf6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:576830420088:android:2b2961101d5362bbd7a98d",
+        "android_client_info": {
+          "package_name": "com.buzzleaf"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqUSO5a1sMB1YZ-MikH0rZDjIWib4Ibn8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

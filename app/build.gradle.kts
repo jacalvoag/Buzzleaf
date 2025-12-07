@@ -2,6 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+
+    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -56,6 +62,43 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    //Room dependecy
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.compiler)
+
+    //Icons dependecy
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    //Hilt dependecy
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    //Navigation dependecy
+    implementation(libs.androidx.navigation.compose)
+
+    //Coil dependecy
+    implementation(libs.coil.compose.base)
+
+    //Paging dependecy
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
+    //Coroutines dependecy
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    //Datastore dependecy
+    implementation(libs.androidx.datastore.preferences)
+
+    //WorkManager dependecy
+    implementation(libs.androidx.work.runtime.ktx)
+
+    //Firebase dependecies
+    implementation(libs.firebase.bom)
+    implementation(libs.firebase.analytics)
 
 
 }
