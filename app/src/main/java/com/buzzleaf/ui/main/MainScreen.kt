@@ -22,13 +22,28 @@ import com.buzzleaf.ui.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    startDestination: String = Screen.Catalog.route,
+    startDestination: String = Screen.Welcome.route,
     onLogout: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val currentRoute = currentDestination?.route
+
+    // Determinar si mostrar TopBar, BottomNav y FAB
+    val authRoutes = listOf(
+        Screen.Welcome.route,
+        Screen.Login.route,
+        Screen.Register.route
+    )
+
+    // Rutas que tienen su propio TopBar
+    val hasOwnTopBar = currentRoute == Screen.Notifications.route ||
+            currentRoute == Screen.Settings.route ||
+            currentRoute?.startsWith("plant_detail") == true ||
+            currentRoute?.startsWith("plant_form") == true
+
+    val showTopBar = currentRoute !in authRoutes && !hasOwnTopBar
 
     val showBottomNav = currentRoute in listOf(
         Screen.Catalog.route,
@@ -40,30 +55,42 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = getTitleForRoute(currentRoute))
-                },
-                actions = {
-                    IconButton(onClick = {
-                        navController.navigate(Screen.Notifications.route)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notificaciones"
+            if (showTopBar) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = getTitleForRoute(currentRoute),
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                         )
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = com.buzzleaf.ui.theme.GreenPrimary,
+                        titleContentColor = com.buzzleaf.ui.theme.TextWhite,
+                        actionIconContentColor = com.buzzleaf.ui.theme.TextWhite
+                    ),
+                    actions = {
+                        // Botón de notificaciones
+                        IconButton(onClick = {
+                            navController.navigate(Screen.Notifications.route)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Notificaciones"
+                            )
+                        }
 
-                    IconButton(onClick = {
-                        navController.navigate(Screen.Settings.route)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Configuración"
-                        )
+                        // Botón de configuración
+                        IconButton(onClick = {
+                            navController.navigate(Screen.Settings.route)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Configuración"
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         },
         bottomBar = {
             if (showBottomNav) {
@@ -78,7 +105,9 @@ fun MainScreen(
                 FloatingActionButton(
                     onClick = {
                         navController.navigate(Screen.PlantForm.createRoute())
-                    }
+                    },
+                    containerColor = com.buzzleaf.ui.theme.GreenAccent,
+                    contentColor = com.buzzleaf.ui.theme.TextWhite
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -101,7 +130,11 @@ private fun BottomNavigationBar(
     navController: NavController,
     currentDestination: androidx.navigation.NavDestination?
 ) {
-    NavigationBar {
+    NavigationBar(
+        containerColor = com.buzzleaf.ui.theme.GreenPrimary,
+        contentColor = com.buzzleaf.ui.theme.TextWhite
+    ) {
+        // Catálogo
         NavigationBarItem(
             selected = currentDestination?.hierarchy?.any {
                 it.route == Screen.Catalog.route
@@ -121,9 +154,17 @@ private fun BottomNavigationBar(
                     contentDescription = "Catálogo"
                 )
             },
-            label = { Text("Catálogo") }
+            label = { Text("Catálogo") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = com.buzzleaf.ui.theme.TextWhite,
+                selectedTextColor = com.buzzleaf.ui.theme.TextWhite,
+                unselectedIconColor = com.buzzleaf.ui.theme.GreenMuted,
+                unselectedTextColor = com.buzzleaf.ui.theme.GreenMuted,
+                indicatorColor = com.buzzleaf.ui.theme.GreenSecondary
+            )
         )
 
+        // Recordatorios
         NavigationBarItem(
             selected = currentDestination?.hierarchy?.any {
                 it.route == Screen.Reminders.route
@@ -143,17 +184,24 @@ private fun BottomNavigationBar(
                     contentDescription = "Recordatorios"
                 )
             },
-            label = { Text("Recordatorios") }
+            label = { Text("Recordatorios") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = com.buzzleaf.ui.theme.TextWhite,
+                selectedTextColor = com.buzzleaf.ui.theme.TextWhite,
+                unselectedIconColor = com.buzzleaf.ui.theme.GreenMuted,
+                unselectedTextColor = com.buzzleaf.ui.theme.GreenMuted,
+                indicatorColor = com.buzzleaf.ui.theme.GreenSecondary
+            )
         )
     }
 }
 
 private fun getTitleForRoute(route: String?): String {
     return when (route) {
-        Screen.Catalog.route -> "Mis Plantas"
-        Screen.Reminders.route -> "Recordatorios"
-        Screen.Notifications.route -> "Notificaciones"
-        Screen.Settings.route -> "Configuración"
+        Screen.Catalog.route -> "CATÁLOGO DE PLANTAS"
+        Screen.Reminders.route -> "PRÓXIMOS CUIDADOS"
+        Screen.Notifications.route -> "NOTIFICACIONES"
+        Screen.Settings.route -> "CONFIGURACIÓN"
         else -> "BuzzLeaf"
     }
 }
