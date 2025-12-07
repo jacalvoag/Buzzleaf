@@ -2,9 +2,18 @@ package com.buzzleaf.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.buzzleaf.R
+
+val PhilosopherFont = FontFamily(
+    Font(R.font.philosopher_regular, FontWeight.Normal),
+    Font(R.font.philosopher_bold, FontWeight.Bold),
+    Font(R.font.philosopher_italic, FontWeight.Normal),
+    Font(R.font.philosopher_bolditalic, FontWeight.Bold)
+)
 
 val Typography = Typography(
     bodyLarge = TextStyle(
@@ -15,7 +24,7 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PhilosopherFont,
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 28.sp,

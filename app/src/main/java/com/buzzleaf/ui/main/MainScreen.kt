@@ -3,14 +3,13 @@ package com.buzzleaf.ui.main
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -18,6 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.buzzleaf.ui.navigation.AppNavigation
 import com.buzzleaf.ui.navigation.Screen
+import com.buzzleaf.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,14 +30,12 @@ fun MainScreen(
     val currentDestination = navBackStackEntry?.destination
     val currentRoute = currentDestination?.route
 
-    // Determinar si mostrar TopBar, BottomNav y FAB
     val authRoutes = listOf(
         Screen.Welcome.route,
         Screen.Login.route,
         Screen.Register.route
     )
 
-    // Rutas que tienen su propio TopBar
     val hasOwnTopBar = currentRoute == Screen.Notifications.route ||
             currentRoute == Screen.Settings.route ||
             currentRoute?.startsWith("plant_detail") == true ||
@@ -69,17 +67,15 @@ fun MainScreen(
                         actionIconContentColor = com.buzzleaf.ui.theme.TextWhite
                     ),
                     actions = {
-                        // Botón de notificaciones
                         IconButton(onClick = {
                             navController.navigate(Screen.Notifications.route)
                         }) {
                             Icon(
-                                imageVector = Icons.Default.Notifications,
+                                painter = painterResource(R.drawable.ic_notifications),
                                 contentDescription = "Notificaciones"
                             )
                         }
 
-                        // Botón de configuración
                         IconButton(onClick = {
                             navController.navigate(Screen.Settings.route)
                         }) {
@@ -134,7 +130,6 @@ private fun BottomNavigationBar(
         containerColor = com.buzzleaf.ui.theme.GreenPrimary,
         contentColor = com.buzzleaf.ui.theme.TextWhite
     ) {
-        // Catálogo
         NavigationBarItem(
             selected = currentDestination?.hierarchy?.any {
                 it.route == Screen.Catalog.route
@@ -150,7 +145,7 @@ private fun BottomNavigationBar(
             },
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Eco,
+                    painter = painterResource(id = R.drawable.ic_potted_plant),
                     contentDescription = "Catálogo"
                 )
             },
@@ -164,7 +159,6 @@ private fun BottomNavigationBar(
             )
         )
 
-        // Recordatorios
         NavigationBarItem(
             selected = currentDestination?.hierarchy?.any {
                 it.route == Screen.Reminders.route
@@ -180,7 +174,7 @@ private fun BottomNavigationBar(
             },
             icon = {
                 Icon(
-                    imageVector = Icons.Default.CalendarMonth,
+                    painter = painterResource(R.drawable.ic_calendar),
                     contentDescription = "Recordatorios"
                 )
             },
