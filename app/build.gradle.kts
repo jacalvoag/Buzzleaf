@@ -97,11 +97,13 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
 
     //Firebase dependecies
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.firebase.storage)
+
 
 }
