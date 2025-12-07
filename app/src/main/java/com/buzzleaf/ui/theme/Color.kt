@@ -15,7 +15,7 @@ val BackgroundWhite = Color(0xFFFFFFFF)
 
 val TextPrimary = Color(0xFF1B4D3E)
 val TextSecondary = Color(0xFF5C9985)
-val TextMuted = Color(0xFF9DB5AC)
+val TextMuted = Color(0xFF1B4332)
 val TextWhite = Color(0xFFFFFFFF)
 
 val EmptyStateIcon = Color(0xFF8BC4B3)

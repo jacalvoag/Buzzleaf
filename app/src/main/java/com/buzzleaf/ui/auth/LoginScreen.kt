@@ -2,6 +2,7 @@ package com.buzzleaf.ui.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,15 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,16 +36,26 @@ import com.buzzleaf.utils.PreferencesManager
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    android.util.Log.d("LoginScreen", "LoginScreen composing")
+
     val context = LocalContext.current
-    val firebaseManager = remember { FirebaseManager(
-        com.google.firebase.auth.FirebaseAuth.getInstance(),
-        com.google.firebase.storage.FirebaseStorage.getInstance()
-    )}
-    val preferencesManager = remember { PreferencesManager(context) }
+    val firebaseManager = remember {
+        android.util.Log.d("LoginScreen", "Creating FirebaseManager")
+        FirebaseManager(
+            com.google.firebase.auth.FirebaseAuth.getInstance(),
+            com.google.firebase.storage.FirebaseStorage.getInstance()
+        )
+    }
+    val preferencesManager = remember {
+        android.util.Log.d("LoginScreen", "Creating PreferencesManager")
+        PreferencesManager(context)
+    }
 
     val viewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(firebaseManager, preferencesManager)
     )
+
+    android.util.Log.d("LoginScreen", "ViewModel created successfully")
 
     val authState by viewModel.authState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
@@ -61,11 +69,6 @@ fun LoginScreen(navController: NavController) {
             navController.navigate(Screen.Catalog.route) {
                 popUpTo(Screen.Welcome.route) { inclusive = true }
             }
-        }
-    }
-
-    LaunchedEffect(authState) {
-        if (authState is AuthState.Error) {
         }
     }
 
@@ -134,22 +137,28 @@ fun LoginScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val annotatedText = buildAnnotatedString {
-                    append("¿Aún no tienes una cuenta? ")
-                    pushStringAnnotation(tag = "REGISTER", annotation = "register")
-                    withStyle(style = SpanStyle(fontStyle = FontStyle.Italic, color = GreenPrimary)) {
-                        append("¡Regístrate aquí!")
-                    }
-                    pop()
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "¿Aún no tienes una cuenta? ",
+                        fontSize = 13.sp,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = "¡Regístrate aquí!",
+                        fontSize = 13.sp,
+                        color = GreenPrimary,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.Register.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                            }
+                        }
+                    )
                 }
-
-                Text(
-                    text = annotatedText,
-                    fontSize = 13.sp,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -170,19 +179,12 @@ fun LoginScreen(navController: NavController) {
                     textAlign = TextAlign.Center
                 )
 
-                val welcomeText = buildAnnotatedString {
-                    append("Vuelve a ingresar a ")
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontFamily = PhilosopherFont)) {
-                        append("BuzzLeaf")
-                    }
-                    append(" y retoma tus plantas justo donde te quedaste.")
-                }
-
                 Text(
-                    text = welcomeText,
+                    text = "Vuelve a ingresar a BuzzLeaf y retoma tus plantas justo donde te quedaste.",
                     fontSize = 14.sp,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
+                    fontFamily = PhilosopherFont,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
 
@@ -260,6 +262,8 @@ fun LoginScreen(navController: NavController) {
 
                 Button(
                     onClick = {
+                        android.util.Log.d("LoginScreen", "Login button clicked")
+                        android.util.Log.d("LoginScreen", "Email: $email, Password length: ${password.length}")
                         viewModel.loginWithEmail(email, password)
                     },
                     modifier = Modifier

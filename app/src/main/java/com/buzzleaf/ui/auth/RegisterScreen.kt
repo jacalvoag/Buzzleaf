@@ -1,6 +1,8 @@
 package com.buzzleaf.ui.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,20 +17,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.buzzleaf.R
 import com.buzzleaf.data.remote.FirebaseManager
 import com.buzzleaf.ui.navigation.Screen
 import com.buzzleaf.ui.theme.*
@@ -36,16 +38,26 @@ import com.buzzleaf.utils.PreferencesManager
 
 @Composable
 fun RegisterScreen(navController: NavController) {
+    android.util.Log.d("RegisterScreen", "RegisterScreen composing")
+
     val context = LocalContext.current
-    val firebaseManager = remember { FirebaseManager(
-        com.google.firebase.auth.FirebaseAuth.getInstance(),
-        com.google.firebase.storage.FirebaseStorage.getInstance()
-    )}
-    val preferencesManager = remember { PreferencesManager(context) }
+    val firebaseManager = remember {
+        android.util.Log.d("RegisterScreen", "Creating FirebaseManager")
+        FirebaseManager(
+            com.google.firebase.auth.FirebaseAuth.getInstance(),
+            com.google.firebase.storage.FirebaseStorage.getInstance()
+        )
+    }
+    val preferencesManager = remember {
+        android.util.Log.d("RegisterScreen", "Creating PreferencesManager")
+        PreferencesManager(context)
+    }
 
     val viewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(firebaseManager, preferencesManager)
     )
+
+    android.util.Log.d("RegisterScreen", "ViewModel created successfully")
 
     val authState by viewModel.authState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
@@ -55,6 +67,14 @@ fun RegisterScreen(navController: NavController) {
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(authState) {
+        android.util.Log.d("RegisterScreen", "AuthState changed: $authState")
+    }
+
+    LaunchedEffect(uiState) {
+        android.util.Log.d("RegisterScreen", "UiState changed: isLoading=${uiState.isLoading}, error=${uiState.error}")
+    }
 
     LaunchedEffect(authState) {
         if (authState is AuthState.Success) {
@@ -86,6 +106,15 @@ fun RegisterScreen(navController: NavController) {
                 .padding(paddingValues)
                 .background(Color(0xFFF5F5F5))
         ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.login_register),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                alpha = 0.7f
+            )
+
             IconButton(
                 onClick = { navController.navigateUp() },
                 modifier = Modifier
@@ -121,22 +150,29 @@ fun RegisterScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val annotatedText = buildAnnotatedString {
-                    append("¿Ya tienes una cuenta? ")
-                    pushStringAnnotation(tag = "LOGIN", annotation = "login")
-                    withStyle(style = SpanStyle(fontStyle = FontStyle.Italic, color = GreenPrimary)) {
-                        append("¡Inicia sesión aquí!")
-                    }
-                    pop()
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "¿Ya tienes una cuenta? ",
+                        fontSize = 13.sp,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = "¡Inicia sesión aquí!",
+                        fontSize = 13.sp,
+                        color = GreenPrimary,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable {
+                            android.util.Log.d("RegisterScreen", "Navigate to Login clicked")
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.Register.route) { inclusive = true }
+                            }
+                        }
+                    )
                 }
-
-                Text(
-                    text = annotatedText,
-                    fontSize = 13.sp,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -150,18 +186,12 @@ fun RegisterScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val messageText = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontFamily = PhilosopherFont)) {
-                        append("BuzzLeaf")
-                    }
-                    append(" está aquí para ayudarte a darle el cuidado que se merecen tus plantas.")
-                }
-
                 Text(
-                    text = messageText,
+                    text = "BuzzLeaf está aquí para ayudarte a darle el cuidado que se merecen tus plantas.",
                     fontSize = 14.sp,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
+                    fontFamily = PhilosopherFont,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
 
@@ -279,6 +309,8 @@ fun RegisterScreen(navController: NavController) {
 
                 Button(
                     onClick = {
+                        android.util.Log.d("RegisterScreen", "Register button clicked")
+                        android.util.Log.d("RegisterScreen", "Email: $email, Password length: ${password.length}, ConfirmPassword length: ${confirmPassword.length}")
                         viewModel.registerWithEmail(email, password, confirmPassword)
                     },
                     modifier = Modifier
