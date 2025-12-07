@@ -1,5 +1,6 @@
 package com.buzzleaf.ui.catalog
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,12 +12,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.buzzleaf.ui.theme.*
+import com.buzzleaf.R
 
 @Composable
 fun CatalogScreen(navController: NavController) {
@@ -94,11 +97,12 @@ fun CatalogScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "💤",
-                    fontSize = 72.sp,
-                    color = EmptyStateIcon,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                Image(
+                    painter = painterResource(R.drawable.grillo),
+                    contentDescription = "No hay nada",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(end = 12.dp)
                 )
 
                 Text(
