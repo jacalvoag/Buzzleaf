@@ -14,7 +14,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
-class FirebaseManager {
+class FirebaseManager(instance: FirebaseAuth, instance1: FirebaseStorage) {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()

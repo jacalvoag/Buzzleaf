@@ -96,6 +96,9 @@ dependencies {
     //WorkManager dependecy
     implementation(libs.androidx.work.runtime.ktx)
 
+    //Foundation dependecy
+    implementation("androidx.compose.foundation:foundation:1.10.0")
+
     //Firebase dependecies
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
