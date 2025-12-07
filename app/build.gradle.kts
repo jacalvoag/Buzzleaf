@@ -105,5 +105,9 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.firebase.storage)
 
+    configurations.all {
+        exclude(group = "com.intellij", module = "annotations")
+    }
+
 
 }
