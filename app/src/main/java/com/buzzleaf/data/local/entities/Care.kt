@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "reminders",
+    tableName = "cares",
     foreignKeys = [
         ForeignKey(
             entity = Plant::class,
@@ -15,19 +15,14 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-data class Reminder(
+data class Care(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
     val plantId: Int,
-    val plantName: String,
 
-    val careToRemind: String,
-    val startDate: Long,
-    val reminderTime: String,
-
-    val isCompleted: Boolean = false,
-    val completedAt: Long? = null,
+    val careType: String,
+    val frequencyDays: Int,
 
     val createdAt: Long = System.currentTimeMillis()
 )
