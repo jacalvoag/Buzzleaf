@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
@@ -64,6 +66,13 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
+    val horizontalPadding = responsiveHorizontalPadding()
+    val verticalSpacing = responsiveVerticalSpacing()
+    val titleSize = responsiveTitleSize()
+    val bodyTextSize = responsiveBodyTextSize()
+    val largeTextSize = responsiveLargeTextSize()
+    val buttonHeight = responsiveButtonHeight()
+
     LaunchedEffect(authState) {
         if (authState is AuthState.Success) {
             navController.navigate(Screen.Catalog.route) {
@@ -91,7 +100,6 @@ fun LoginScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(Color(0xFFF5F5F5))
         ) {
 
@@ -103,31 +111,20 @@ fun LoginScreen(navController: NavController) {
                 alpha = 0.7f
             )
 
-            IconButton(
-                onClick = { navController.navigateUp() },
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.TopStart)
-            ) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Volver",
-                    tint = Color.Black
-                )
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 32.dp),
+                    .verticalScroll(rememberScrollState())
+                    .padding(paddingValues)
+                    .padding(horizontal = horizontalPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 4))
 
                 Text(
                     text = "INICIAR SESIÓN",
-                    fontSize = 24.sp,
+                    fontSize = titleSize,
                     fontWeight = FontWeight.Bold,
                     fontFamily = PhilosopherFont,
                     color = Color.Black,
@@ -135,20 +132,21 @@ fun LoginScreen(navController: NavController) {
                     letterSpacing = 2.sp
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 0.5f))
 
                 Row(
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
                     Text(
                         text = "¿Aún no tienes una cuenta? ",
-                        fontSize = 13.sp,
+                        fontSize = bodyTextSize,
                         color = Color.Black
                     )
                     Text(
                         text = "¡Regístrate aquí!",
-                        fontSize = 13.sp,
+                        fontSize = bodyTextSize,
                         color = GreenPrimary,
                         fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Bold,
@@ -160,40 +158,40 @@ fun LoginScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
 
                 Text(
                     text = "¡Bienvenido de nuevo!",
-                    fontSize = 16.sp,
+                    fontSize = largeTextSize,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 0.25f))
 
                 Text(
                     text = "Nos alegra volver a tenerte por aquí.",
-                    fontSize = 14.sp,
+                    fontSize = bodyTextSize,
                     color = Color.Black,
                     textAlign = TextAlign.Center
                 )
 
                 Text(
                     text = "Vuelve a ingresar a BuzzLeaf y retoma tus plantas justo donde te quedaste.",
-                    fontSize = 14.sp,
+                    fontSize = bodyTextSize,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     fontFamily = PhilosopherFont,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Correo electrónico",
-                        fontSize = 14.sp,
+                        fontSize = bodyTextSize,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -203,7 +201,7 @@ fun LoginScreen(navController: NavController) {
                         value = email,
                         onValueChange = { email = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("someone@example.com", fontSize = 14.sp, color = Color.Gray) },
+                        placeholder = { Text("someone@example.com", fontSize = bodyTextSize, color = Color.Gray) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color.White,
                             unfocusedContainerColor = Color.White,
@@ -218,12 +216,12 @@ fun LoginScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing))
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Contraseña",
-                        fontSize = 14.sp,
+                        fontSize = bodyTextSize,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -233,7 +231,7 @@ fun LoginScreen(navController: NavController) {
                         value = password,
                         onValueChange = { password = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Mínimo 8 caracteres", fontSize = 14.sp, color = Color.Gray) },
+                        placeholder = { Text("Mínimo 8 caracteres", fontSize = bodyTextSize, color = Color.Gray) },
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
@@ -258,7 +256,7 @@ fun LoginScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
 
                 Button(
                     onClick = {
@@ -267,8 +265,8 @@ fun LoginScreen(navController: NavController) {
                         viewModel.loginWithEmail(email, password)
                     },
                     modifier = Modifier
-                        .width(180.dp)
-                        .height(48.dp),
+                        .widthIn(min = 160.dp, max = 200.dp)
+                        .height(buttonHeight),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = GreenPrimary,
                         contentColor = Color.White
@@ -284,11 +282,26 @@ fun LoginScreen(navController: NavController) {
                     } else {
                         Text(
                             "¡Iniciar sesión!",
-                            fontSize = 15.sp,
+                            fontSize = largeTextSize,
                             fontWeight = FontWeight.Bold
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
+            }
+
+            IconButton(
+                onClick = { navController.navigateUp() },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.TopStart)
+            ) {
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = "Volver",
+                    tint = Color.Black
+                )
             }
         }
     }

@@ -40,14 +40,30 @@ fun CatalogScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(plants) { plant ->
-                    PlantCard(
-                        plant = plant,
-                        onClick = {
-                            navController.navigate(Screen.PlantDetail.createRoute(plant.id))
-                        }
-                    )
-                }
+                Image(
+                    painter = painterResource(R.drawable.grillo),
+                    contentDescription = "No hay nada",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(end = 12.dp)
+                )
+
+                Text(
+                    text = "No hay nada por aquí de momento.",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = EmptyStateText,
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    text = "El jardín parece estar tranquilo...",
+                    fontSize = 14.sp,
+                    color = EmptyStateText.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center
+                )
+
+
             }
         }
     }

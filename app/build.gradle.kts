@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         applicationId = "com.buzzleaf"
-        minSdk = 29
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
