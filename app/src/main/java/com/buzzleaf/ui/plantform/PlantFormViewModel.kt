@@ -5,23 +5,24 @@ import androidx.lifecycle.viewModelScope
 import com.buzzleaf.data.local.entities.Care
 import com.buzzleaf.data.local.entities.Plant
 import com.buzzleaf.data.local.entities.Reminder
-import com.buzzleaf.data.remote.FirebaseManager // [IMPORTANTE] Asegura este import
+import com.buzzleaf.data.remote.FirebaseManager
 import com.buzzleaf.data.repository.PlantRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableStateFlow // <--- IMPORTANTE
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.update // <--- IMPORTANTE PARA USAR .update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PlantFormViewModel @Inject constructor(
     private val repository: PlantRepository,
-    private val firebaseManager: FirebaseManager // [IMPORTANTE] Inyección de Firebase
+    private val firebaseManager: FirebaseManager
 ) : ViewModel() {
 
-    // --- ESTADO DE LA UI (Esta es la parte que probablemente faltaba) ---
+    // --- ESTADO DE LA UI ---
+    // Si esta variable no está dentro de la clase, el resto fallará.
     private val _uiState = MutableStateFlow(PlantFormUiState())
     val uiState: StateFlow<PlantFormUiState> = _uiState.asStateFlow()
 
@@ -95,16 +96,16 @@ class PlantFormViewModel @Inject constructor(
         _uiState.update { it.copy(reminderList = currentReminders) }
     }
 
-    // --- Guardar Todo (Con ID de Usuario Real) ---
+    // --- Guardar Todo ---
     fun savePlant(onSuccess: () -> Unit) {
         viewModelScope.launch {
             val state = _uiState.value
 
-            // Obtenemos el ID real del usuario logueado en Firebase
+            // Obtenemos el ID real del usuario (o "anonymous" si falla)
             val currentUserId = firebaseManager.getCurrentUser()?.uid ?: "anonymous"
 
             val plant = Plant(
-                userId = currentUserId, // Guardamos con el ID correcto
+                userId = currentUserId,
                 commonName = state.plantName,
                 plantType = state.plantType,
                 sunAmount = state.sunAmount,
@@ -145,14 +146,13 @@ class PlantFormViewModel @Inject constructor(
     fun saveEditedSection(plantId: Int, section: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
             val state = _uiState.value
-            // Mantenemos el ID de usuario original al editar (o podrías validarlo)
             val currentUserId = firebaseManager.getCurrentUser()?.uid ?: "anonymous"
 
             when (section) {
                 0 -> { // Info Básica
                     val updatedPlant = Plant(
                         id = plantId,
-                        userId = currentUserId, // Aseguramos mantener el usuario
+                        userId = currentUserId,
                         commonName = state.plantName,
                         plantType = state.plantType,
                         sunAmount = state.sunAmount,
@@ -172,19 +172,17 @@ class PlantFormViewModel @Inject constructor(
             onSuccess()
         }
     }
-}
+} // <--- ASEGÚRATE DE QUE ESTA LLAVE CIERRE AQUÍ, NO ANTES
 
+// La data class debe estar FUERA de la clase ViewModel, pero en el mismo archivo
 data class PlantFormUiState(
     val currentStep: Int = 0,
-    // Paso 1
     val plantName: String = "",
     val plantType: String = "",
     val sunAmount: String = "",
     val waterAmount: String = "",
     val soilType: String = "",
     val imageUri: String? = null,
-    // Paso 2
     val careList: List<Care> = emptyList(),
-    // Paso 3
     val reminderList: List<Reminder> = emptyList()
 )
