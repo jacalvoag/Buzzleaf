@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,6 +46,30 @@ fun WelcomeScreen(navController: NavController) {
     val authState by viewModel.authState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
+    val horizontalPadding = responsiveHorizontalPadding()
+    val verticalSpacing = responsiveVerticalSpacing()
+    val buttonHeight = responsiveButtonHeight()
+    val largeTextSize = responsiveLargeTextSize()
+    val screenSize = rememberScreenSize()
+
+    val logoSize = when {
+        screenSize.isSmallScreen -> 50.dp
+        screenSize.isMediumScreen -> 60.dp
+        else -> 70.dp
+    }
+
+    val titleSize = when {
+        screenSize.isSmallScreen -> 40.sp
+        screenSize.isMediumScreen -> 50.sp
+        else -> 60.sp
+    }
+
+    val subtitleSize = when {
+        screenSize.isSmallScreen -> 20.sp
+        screenSize.isMediumScreen -> 23.sp
+        else -> 26.sp
+    }
+
     LaunchedEffect(authState) {
         if (authState is AuthState.Success) {
             navController.navigate(Screen.Catalog.route) {
@@ -68,7 +94,6 @@ fun WelcomeScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(Color.Black)
         ) {
             Image(
@@ -82,11 +107,13 @@ fun WelcomeScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(32.dp),
+                    .verticalScroll(rememberScrollState())
+                    .padding(paddingValues)
+                    .padding(horizontalPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Spacer(modifier = Modifier.height(60.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 3))
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -102,14 +129,14 @@ fun WelcomeScreen(navController: NavController) {
                             painter = painterResource(R.drawable.logobuzzleaf),
                             contentDescription = "Buzzleaf logo",
                             modifier = Modifier
-                                .size(70.dp)
+                                .size(logoSize)
                                 .padding(end = 12.dp)
 
                         )
 
                         Text(
                             text = "BuzzLeaf",
-                            fontSize = 60.sp,
+                            fontSize = titleSize,
                             fontWeight = FontWeight.Bold,
                             fontFamily = PhilosopherFont,
                             color = TextWhite,
@@ -117,11 +144,11 @@ fun WelcomeScreen(navController: NavController) {
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(verticalSpacing))
 
                     Text(
                         text = "Cuida tus plantas",
-                        fontSize = 26.sp,
+                        fontSize = subtitleSize,
                         fontWeight = FontWeight.Bold,
                         fontFamily = PhilosopherFont,
                         color = TextWhite.copy(alpha = 0.9f),
@@ -129,7 +156,7 @@ fun WelcomeScreen(navController: NavController) {
                     )
                     Text(
                         text = "Cuida tu calma",
-                        fontSize = 26.sp,
+                        fontSize = subtitleSize,
                         fontWeight = FontWeight.Bold,
                         fontFamily = PhilosopherFont,
                         color = TextWhite.copy(alpha = 0.9f),
@@ -139,13 +166,13 @@ fun WelcomeScreen(navController: NavController) {
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(verticalSpacing)
                 ) {
                     Button(
                         onClick = { navController.navigate(Screen.Login.route) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
+                            .height(buttonHeight),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Black.copy(alpha = 0.5f),
                             contentColor = Color.White
@@ -155,7 +182,7 @@ fun WelcomeScreen(navController: NavController) {
                     ) {
                         Text(
                             "Iniciar Sesión",
-                            fontSize = 16.sp,
+                            fontSize = largeTextSize,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -164,7 +191,7 @@ fun WelcomeScreen(navController: NavController) {
                         onClick = { navController.navigate(Screen.Register.route) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
+                            .height(buttonHeight),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Black.copy(alpha = 0.5f),
                             contentColor = Color.White
@@ -174,7 +201,7 @@ fun WelcomeScreen(navController: NavController) {
                     ) {
                         Text(
                             "Registrarse",
-                            fontSize = 16.sp,
+                            fontSize = largeTextSize,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -182,7 +209,7 @@ fun WelcomeScreen(navController: NavController) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = verticalSpacing * 0.5f),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Divider(
@@ -192,9 +219,9 @@ fun WelcomeScreen(navController: NavController) {
                         )
                         Text(
                             text = "O",
-                            modifier = Modifier.padding(horizontal = 16.dp),
+                            modifier = Modifier.padding(horizontal = horizontalPadding * 0.5f),
                             color = Color.White,
-                            fontSize = 14.sp,
+                            fontSize = responsiveBodyTextSize(),
                             fontWeight = FontWeight.Bold
                         )
                         Divider(
@@ -210,7 +237,7 @@ fun WelcomeScreen(navController: NavController) {
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp)
+                            .height(buttonHeight)
                             .border(
                                 width = 1.dp,
                                 color = Color.White.copy(alpha = 0.5f),
@@ -242,7 +269,7 @@ fun WelcomeScreen(navController: NavController) {
                                 )
                                 Text(
                                     "Continuar con Google",
-                                    fontSize = 16.sp,
+                                    fontSize = largeTextSize,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -250,7 +277,7 @@ fun WelcomeScreen(navController: NavController) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
             }
         }
     }
