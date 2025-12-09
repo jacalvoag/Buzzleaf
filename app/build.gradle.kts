@@ -80,7 +80,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     //Coil dependecy
-    implementation(libs.coil.compose.base)
+    implementation(libs.coil.compose)
 
     //Paging dependecy
     implementation(libs.androidx.paging.runtime)

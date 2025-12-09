@@ -19,6 +19,10 @@ interface CareDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCares(cares: List<Care>)
 
+    // Esta es la función que faltaba y causaba el error en el repositorio
+    @Query("DELETE FROM cares WHERE plantId = :plantId")
+    suspend fun deleteCaresByPlantId(plantId: Int)
+
     @Update
     suspend fun updateCare(care: Care)
 
