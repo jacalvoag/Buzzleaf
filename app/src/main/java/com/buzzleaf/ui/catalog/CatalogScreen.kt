@@ -20,124 +20,50 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.buzzleaf.ui.theme.*
 import com.buzzleaf.R
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle // O collectAsState normal
 
 @Composable
-fun CatalogScreen(navController: NavController) {
-    var searchQuery by remember { mutableStateOf("") }
+fun CatalogScreen(
+    navController: NavController,
+    viewModel: CatalogViewModel = hiltViewModel()
+) {
+    val plants by viewModel.plants.collectAsState(initial = emptyList())
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundLight)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                modifier = Modifier.weight(1f),
-                placeholder = {
-                    Text(
-                        "BUSCAR POR NOMBRE",
-                        fontSize = 12.sp,
-                        color = TextMuted
-                    )
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    // Navegar al formulario en modo CREATE
+                    navController.navigate(Screen.PlantForm.createRoute())
                 },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = "Buscar",
-                        tint = GreenMuted
-                    )
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = SearchBackground,
-                    unfocusedContainerColor = SearchBackground,
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                ),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true
-            )
-
-            OutlinedButton(
-                onClick = { /* TODO: Mostrar filtros */ },
-                modifier = Modifier.height(56.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = FilterBackground
-                ),
-                border = null,
-                shape = RoundedCornerShape(12.dp)
+                containerColor = GreenPrimary
             ) {
-                Icon(
-                    Icons.Default.FilterList,
-                    contentDescription = "Filtrar",
-                    tint = GreenMuted
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    "FILTRAR POR",
-                    fontSize = 11.sp,
-                    color = TextMuted
-                )
+                Icon(Icons.Default.Add, contentDescription = "Agregar Planta", tint = Color.White)
             }
         }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+    ) { padding ->
+        if (plants.isEmpty()) {
+            // Mostrar tu vista vacía aquí
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("No tienes plantas aún. ¡Agrega una!")
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(150.dp),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(padding)
             ) {
-                Image(
-                    painter = painterResource(R.drawable.grillo),
-                    contentDescription = "No hay nada",
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(end = 12.dp)
-                )
-
-                Text(
-                    text = "No hay nada por aquí de momento.",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = EmptyStateText,
-                    textAlign = TextAlign.Center
-                )
-
-                Text(
-                    text = "El jardín parece estar tranquilo...",
-                    fontSize = 14.sp,
-                    color = EmptyStateText.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(48.dp))
-
-                Text(
-                    text = "Registra tu primera planta\nhaciendo clic en este botón",
-                    fontSize = 14.sp,
-                    color = EmptyStateText,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "↓",
-                    fontSize = 32.sp,
-                    color = GreenAccent,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                items(plants) { plant ->
+                    PlantCard(
+                        plant = plant,
+                        onClick = {
+                            navController.navigate(Screen.PlantDetail.createRoute(plant.id))
+                        }
+                    )
+                }
             }
         }
     }

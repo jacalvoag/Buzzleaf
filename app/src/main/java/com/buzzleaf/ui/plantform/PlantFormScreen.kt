@@ -30,66 +30,73 @@ fun PlantFormScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    // Cargar datos si es modo edición y aún no se han cargado
+    LaunchedEffect(plantId, mode) {
+        if (mode == "EDIT" && plantId != null) {
+            viewModel.loadPlantForEditing(plantId)
+            viewModel.setStep(startPage) // Forzar ir a la página específica
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (mode == "CREATE") "Nueva Planta" else "Editar Planta") },
+                title = {
+                    Text(
+                        if (mode == "CREATE") "Nueva Planta"
+                        else when(startPage) {
+                            0 -> "Editar Información"
+                            1 -> "Editar Cuidados"
+                            2 -> "Editar Recordatorios"
+                            else -> "Editar"
+                        }
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    titleContentColor = GreenPrimary,
-                    navigationIconContentColor = GreenPrimary
-                )
+                }
             )
         },
         bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                if (uiState.currentStep > 0) {
-                    OutlinedButton(
-                        onClick = { viewModel.previousStep() },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenPrimary)
-                    ) {
-                        Text("Anterior")
-                    }
-                } else {
-                    Spacer(modifier = Modifier.width(8.dp))
+            // Barra inferior diferente según el modo
+            if (mode == "CREATE") {
+                // ... (Tu lógica existente de navegación Next/Prev) ...
+                Row( /* ... */ ) {
+                    // ... Botones Anterior / Siguiente ...
                 }
-
+            } else {
+                // MODO EDICIÓN: Solo botón de guardar esa sección
                 Button(
                     onClick = {
-                        if (uiState.currentStep < 2) {
-                            viewModel.nextStep()
-                        } else {
-                            viewModel.savePlant {
-                                navController.popBackStack()
-                            }
+                        viewModel.saveEditedSection(plantId!!, startPage) {
+                            navController.popBackStack()
                         }
                     },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
                 ) {
-                    Text(if (uiState.currentStep == 2) "Guardar" else "Siguiente")
+                    Text("Guardar Cambios")
                 }
             }
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            // Indicador de Pasos
-            StepIndicator(currentStep = uiState.currentStep)
+        Column(modifier = Modifier.padding(paddingValues)) {
 
-            // Contenido dinámico
-            when (uiState.currentStep) {
+            // Mostrar indicador de pasos SOLO si es CREATE
+            if (mode == "CREATE") {
+                StepIndicator(currentStep = uiState.currentStep)
+            }
+
+            // Mostrar el contenido.
+            // Si es CREATE, usa uiState.currentStep.
+            // Si es EDIT, usa startPage directamente (ya que no navegamos).
+            val stepToShow = if (mode == "CREATE") uiState.currentStep else startPage
+
+            when (stepToShow) {
                 0 -> BasicInfoStep(
                     uiState = uiState,
                     onInfoChange = { n, t, s, w, so, i -> viewModel.updateBasicInfo(n, t, s, w, so, i) }

@@ -13,19 +13,25 @@ class PlantRepository @Inject constructor(
     private val careDao: CareDao,
     private val reminderDao: ReminderDao
 ) {
-    // Insertar planta y sus relaciones en una "transacción" lógica
-    suspend fun savePlantWithDetails(plant: Plant, cares: List<Care>, reminders: List<Reminder>) {
-        // 1. Insertar planta y obtener el ID generado
-        val plantId = plantDao.insertPlant(plant).toInt()
+    // ... (tu función savePlantWithDetails existente)
 
-        // 2. Asignar el ID de la planta a los cuidados e insertarlos
-        val caresWithId = cares.map { it.copy(plantId = plantId) }
-        careDao.insertCares(caresWithId) // Asumiendo que creaste un método para insertar lista
+    fun getAllPlants() = plantDao.getAllPlants()
 
-        // 3. Asignar el ID de la planta a los recordatorios e insertarlos
-        // Nota: En un caso real complejo, tendrías que mapear qué recordatorio va con qué cuidado específico
-        // Por simplicidad ahora, asignamos el plantId general.
-        val remindersWithId = reminders.map { it.copy(plantId = plantId) }
+    fun getPlantById(id: Int) = plantDao.getPlantWithDetails(id)
+
+    // Funciones para actualizar secciones individuales
+    suspend fun updatePlant(plant: Plant) = plantDao.updatePlant(plant) // Asegúrate de tener @Update en tu DAO
+
+    suspend fun updateCares(plantId: Int, newCares: List<Care>) {
+        // Estrategia simple: borrar anteriores y poner nuevos para evitar conflictos de IDs
+        careDao.deleteCaresByPlantId(plantId) // Necesitas crear esta Query en CareDao
+        val caresWithId = newCares.map { it.copy(plantId = plantId, id = 0) }
+        careDao.insertCares(caresWithId)
+    }
+
+    suspend fun updateReminders(plantId: Int, newReminders: List<Reminder>) {
+        reminderDao.deleteRemindersByPlantId(plantId) // Crear Query en ReminderDao
+        val remindersWithId = newReminders.map { it.copy(plantId = plantId, id = 0) }
         reminderDao.insertReminders(remindersWithId)
     }
 }

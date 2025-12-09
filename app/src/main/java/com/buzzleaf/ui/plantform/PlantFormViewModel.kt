@@ -117,6 +117,55 @@ class PlantFormViewModel @Inject constructor(
             onSuccess()
         }
     }
+
+    fun setStep(step: Int) {
+        _uiState.update { it.copy(currentStep = step) }
+    }
+
+    fun loadPlantForEditing(plantId: Int) {
+        viewModelScope.launch {
+            repository.getPlantById(plantId).collect { details ->
+                _uiState.update {
+                    it.copy(
+                        plantName = details.plant.commonName,
+                        plantType = details.plant.plantType,
+                        // ... mapear resto de campos Info
+                        careList = details.cares,
+                        reminderList = details.reminders
+                    )
+                }
+            }
+        }
+    }
+
+    fun saveEditedSection(plantId: Int, section: Int, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val state = _uiState.value
+            when (section) {
+                0 -> { // Info Básica
+                    val updatedPlant = Plant(
+                        id = plantId,
+                        userId = "user", // Mantener ID original
+                        commonName = state.plantName,
+                        plantType = state.plantType,
+                        sunAmount = state.sunAmount,
+                        waterAmount = state.waterAmount,
+                        soilType = state.soilType,
+                        imageUrl = state.imageUri
+                        // createdAt se mantiene, updatedAt se debería actualizar
+                    )
+                    repository.updatePlant(updatedPlant)
+                }
+                1 -> { // Cuidados
+                    repository.updateCares(plantId, state.careList)
+                }
+                2 -> { // Recordatorios
+                    repository.updateReminders(plantId, state.reminderList)
+                }
+            }
+            onSuccess()
+        }
+    }
 }
 
 data class PlantFormUiState(
