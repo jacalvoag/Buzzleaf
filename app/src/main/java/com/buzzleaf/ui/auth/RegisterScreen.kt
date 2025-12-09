@@ -68,6 +68,13 @@ fun RegisterScreen(navController: NavController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
+    val horizontalPadding = responsiveHorizontalPadding()
+    val verticalSpacing = responsiveVerticalSpacing()
+    val titleSize = responsiveTitleSize()
+    val bodyTextSize = responsiveBodyTextSize()
+    val largeTextSize = responsiveLargeTextSize()
+    val buttonHeight = responsiveButtonHeight()
+
     LaunchedEffect(authState) {
         android.util.Log.d("RegisterScreen", "AuthState changed: $authState")
     }
@@ -103,7 +110,6 @@ fun RegisterScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(Color(0xFFF5F5F5))
         ) {
 
@@ -115,32 +121,20 @@ fun RegisterScreen(navController: NavController) {
                 alpha = 0.7f
             )
 
-            IconButton(
-                onClick = { navController.navigateUp() },
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.TopStart)
-            ) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Volver",
-                    tint = Color.Black
-                )
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 32.dp),
+                    .padding(paddingValues)
+                    .padding(horizontal = horizontalPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 4))
 
                 Text(
                     text = "REGISTRARSE",
-                    fontSize = 24.sp,
+                    fontSize = titleSize,
                     fontWeight = FontWeight.Bold,
                     fontFamily = PhilosopherFont,
                     color = Color.Black,
@@ -148,20 +142,21 @@ fun RegisterScreen(navController: NavController) {
                     letterSpacing = 2.sp
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 0.5f))
 
                 Row(
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 ) {
                     Text(
                         text = "¿Ya tienes una cuenta? ",
-                        fontSize = 13.sp,
+                        fontSize = bodyTextSize,
                         color = Color.Black
                     )
                     Text(
                         text = "¡Inicia sesión aquí!",
-                        fontSize = 13.sp,
+                        fontSize = bodyTextSize,
                         color = GreenPrimary,
                         fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Bold,
@@ -174,33 +169,33 @@ fun RegisterScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
 
                 Text(
                     text = "¿Tienes una agenda muy apretada?",
-                    fontSize = 16.sp,
+                    fontSize = largeTextSize,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 0.5f))
 
                 Text(
                     text = "BuzzLeaf está aquí para ayudarte a darle el cuidado que se merecen tus plantas.",
-                    fontSize = 14.sp,
+                    fontSize = bodyTextSize,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     fontFamily = PhilosopherFont,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Correo electrónico",
-                        fontSize = 14.sp,
+                        fontSize = bodyTextSize,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -210,7 +205,7 @@ fun RegisterScreen(navController: NavController) {
                         value = email,
                         onValueChange = { email = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("someone@example.com", fontSize = 14.sp, color = Color.Gray) },
+                        placeholder = { Text("someone@example.com", fontSize = bodyTextSize, color = Color.Gray) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color.White,
                             unfocusedContainerColor = Color.White,
@@ -225,12 +220,12 @@ fun RegisterScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing))
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Contraseña",
-                        fontSize = 14.sp,
+                        fontSize = bodyTextSize,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -240,7 +235,7 @@ fun RegisterScreen(navController: NavController) {
                         value = password,
                         onValueChange = { password = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Mínimo 8 caracteres", fontSize = 14.sp, color = Color.Gray) },
+                        placeholder = { Text("Mínimo 8 caracteres", fontSize = bodyTextSize, color = Color.Gray) },
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
@@ -265,12 +260,12 @@ fun RegisterScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing))
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         "Confirma tu contraseña",
-                        fontSize = 14.sp,
+                        fontSize = bodyTextSize,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -280,7 +275,7 @@ fun RegisterScreen(navController: NavController) {
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Repite tu contraseña", fontSize = 14.sp, color = Color.Gray) },
+                        placeholder = { Text("Repite tu contraseña", fontSize = bodyTextSize, color = Color.Gray) },
                         trailingIcon = {
                             IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                                 Icon(
@@ -305,7 +300,7 @@ fun RegisterScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
 
                 Button(
                     onClick = {
@@ -314,8 +309,8 @@ fun RegisterScreen(navController: NavController) {
                         viewModel.registerWithEmail(email, password, confirmPassword)
                     },
                     modifier = Modifier
-                        .width(180.dp)
-                        .height(48.dp),
+                        .widthIn(min = 160.dp, max = 200.dp)
+                        .height(buttonHeight),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = GreenPrimary,
                         contentColor = Color.White
@@ -331,13 +326,29 @@ fun RegisterScreen(navController: NavController) {
                     } else {
                         Text(
                             "¡Regístrate!",
-                            fontSize = 15.sp,
+                            fontSize = largeTextSize,
                             fontWeight = FontWeight.Bold
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(verticalSpacing * 2))
+            }
+
+            IconButton(
+                onClick = {
+                    android.util.Log.d("RegisterScreen", "Back button clicked")
+                    navController.navigateUp()
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.TopStart)
+            ) {
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = "Volver",
+                    tint = Color.Black
+                )
             }
         }
     }
