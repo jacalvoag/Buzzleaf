@@ -120,24 +120,7 @@ fun CatalogScreen(navController: NavController) {
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(48.dp))
 
-                Text(
-                    text = "Registra tu primera planta\nhaciendo clic en este botón",
-                    fontSize = 14.sp,
-                    color = EmptyStateText,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "↓",
-                    fontSize = 32.sp,
-                    color = GreenAccent,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
             }
         }
     }
