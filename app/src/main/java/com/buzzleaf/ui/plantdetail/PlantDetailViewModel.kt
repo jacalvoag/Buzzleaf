@@ -2,7 +2,7 @@ package com.buzzleaf.ui.plantdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.buzzleaf.data.local.entities.PlantWithDetails
+import com.buzzleaf.data.local.entities.PlantWithDetails // [IMPORTANTE] Asegura este import
 import com.buzzleaf.data.repository.PlantRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +17,11 @@ class PlantDetailViewModel @Inject constructor(
     private val repository: PlantRepository
 ) : ViewModel() {
 
-    // Estado interno mutable
     private val _uiState = MutableStateFlow(PlantDetailUiState())
-    // Estado público inmutable
     val uiState: StateFlow<PlantDetailUiState> = _uiState.asStateFlow()
 
     fun loadPlant(plantId: Int) {
         viewModelScope.launch {
-            // Recolectamos el Flow del repositorio (que devuelve PlantWithDetails)
             repository.getPlantById(plantId).collect { details ->
                 _uiState.update { currentState ->
                     currentState.copy(plantDetails = details)
@@ -34,7 +31,7 @@ class PlantDetailViewModel @Inject constructor(
     }
 }
 
-// Clase de datos para el estado de la UI
+// [IMPORTANTE] Esta clase debe estar aquí para que el Screen la reconozca
 data class PlantDetailUiState(
     val plantDetails: PlantWithDetails? = null
 )

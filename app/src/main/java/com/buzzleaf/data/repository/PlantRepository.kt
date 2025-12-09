@@ -6,6 +6,8 @@ import com.buzzleaf.data.local.dao.ReminderDao
 import com.buzzleaf.data.local.entities.Plant
 import com.buzzleaf.data.local.entities.Care
 import com.buzzleaf.data.local.entities.Reminder
+import com.buzzleaf.data.local.entities.PlantWithDetails // Import necesario
+import kotlinx.coroutines.flow.Flow // Import necesario
 import javax.inject.Inject
 
 class PlantRepository @Inject constructor(
@@ -13,24 +15,31 @@ class PlantRepository @Inject constructor(
     private val careDao: CareDao,
     private val reminderDao: ReminderDao
 ) {
-    // ... (tu función savePlantWithDetails existente)
+    fun getAllPlants(): Flow<List<Plant>> = plantDao.getAllPlants()
 
-    fun getAllPlants() = plantDao.getAllPlants()
+    // Esta función debe devolver Flow<PlantWithDetails>
+    fun getPlantById(id: Int): Flow<PlantWithDetails> = plantDao.getPlantWithDetails(id)
 
-    fun getPlantById(id: Int) = plantDao.getPlantWithDetails(id)
+    suspend fun savePlantWithDetails(plant: Plant, cares: List<Care>, reminders: List<Reminder>) {
+        val plantId = plantDao.insertPlant(plant).toInt()
 
-    // Funciones para actualizar secciones individuales
-    suspend fun updatePlant(plant: Plant) = plantDao.updatePlant(plant) // Asegúrate de tener @Update en tu DAO
+        val caresWithId = cares.map { it.copy(plantId = plantId) }
+        careDao.insertCares(caresWithId)
+
+        val remindersWithId = reminders.map { it.copy(plantId = plantId) }
+        reminderDao.insertReminders(remindersWithId)
+    }
+
+    suspend fun updatePlant(plant: Plant) = plantDao.updatePlant(plant)
 
     suspend fun updateCares(plantId: Int, newCares: List<Care>) {
-        // Estrategia simple: borrar anteriores y poner nuevos para evitar conflictos de IDs
-        careDao.deleteCaresByPlantId(plantId) // Necesitas crear esta Query en CareDao
+        careDao.deleteCaresByPlantId(plantId)
         val caresWithId = newCares.map { it.copy(plantId = plantId, id = 0) }
         careDao.insertCares(caresWithId)
     }
 
     suspend fun updateReminders(plantId: Int, newReminders: List<Reminder>) {
-        reminderDao.deleteRemindersByPlantId(plantId) // Crear Query en ReminderDao
+        reminderDao.deleteRemindersByPlantId(plantId)
         val remindersWithId = newReminders.map { it.copy(plantId = plantId, id = 0) }
         reminderDao.insertReminders(remindersWithId)
     }
