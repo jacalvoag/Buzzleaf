@@ -17,8 +17,9 @@ class PlantRepository @Inject constructor(
 ) {
     fun getAllPlants(): Flow<List<Plant>> = plantDao.getAllPlants()
 
-    // Esta función debe devolver Flow<PlantWithDetails>
     fun getPlantById(id: Int): Flow<PlantWithDetails> = plantDao.getPlantWithDetails(id)
+
+    fun getPlantsForUser(userId: String): Flow<List<Plant>> = plantDao.getPlantsForUser(userId)
 
     suspend fun savePlantWithDetails(plant: Plant, cares: List<Care>, reminders: List<Reminder>) {
         val plantId = plantDao.insertPlant(plant).toInt()

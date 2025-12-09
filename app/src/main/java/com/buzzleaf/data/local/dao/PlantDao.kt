@@ -10,6 +10,9 @@ interface PlantDao {
     @Query("SELECT * FROM plants ORDER BY createdAt DESC")
     fun getAllPlants(): Flow<List<Plant>>
 
+    @Query("SELECT * FROM plants WHERE userId = :userId ORDER BY createdAt DESC")
+    fun getPlantsForUser(userId: String): Flow<List<Plant>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlant(plant: Plant): Long
 

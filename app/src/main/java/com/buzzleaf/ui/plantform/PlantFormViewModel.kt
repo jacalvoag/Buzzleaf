@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.buzzleaf.data.local.entities.Care
 import com.buzzleaf.data.local.entities.Plant
 import com.buzzleaf.data.local.entities.Reminder
+import com.buzzleaf.data.remote.FirebaseManager // [IMPORTANTE] Asegura este import
 import com.buzzleaf.data.repository.PlantRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,10 +17,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlantFormViewModel @Inject constructor(
-    private val repository: PlantRepository
+    private val repository: PlantRepository,
+    private val firebaseManager: FirebaseManager // [IMPORTANTE] Inyección de Firebase
 ) : ViewModel() {
 
-    // Estado de la UI
+    // --- ESTADO DE LA UI (Esta es la parte que probablemente faltaba) ---
     private val _uiState = MutableStateFlow(PlantFormUiState())
     val uiState: StateFlow<PlantFormUiState> = _uiState.asStateFlow()
 
@@ -65,9 +67,6 @@ class PlantFormViewModel @Inject constructor(
             frequencyDays = frequency
         )
         _uiState.update { it.copy(careList = it.careList + newCare) }
-
-        // Al agregar un cuidado, preparamos un recordatorio por defecto (opcional)
-        // O simplemente dejamos que el usuario lo configure en el paso 3
     }
 
     fun removeCare(care: Care) {
@@ -75,10 +74,7 @@ class PlantFormViewModel @Inject constructor(
     }
 
     // --- Paso 3: Recordatorios ---
-    // Aquí generamos recordatorios temporales basados en los cuidados agregados
     fun updateReminder(careType: String, startDate: Long, time: String) {
-        // Buscamos si ya existe un recordatorio para este tipo de cuidado y lo actualizamos
-        // O creamos uno nuevo
         val currentReminders = _uiState.value.reminderList.toMutableList()
         val index = currentReminders.indexOfFirst { it.careToRemind == careType }
 
@@ -99,12 +95,16 @@ class PlantFormViewModel @Inject constructor(
         _uiState.update { it.copy(reminderList = currentReminders) }
     }
 
-    // --- Guardar Todo ---
+    // --- Guardar Todo (Con ID de Usuario Real) ---
     fun savePlant(onSuccess: () -> Unit) {
         viewModelScope.launch {
             val state = _uiState.value
+
+            // Obtenemos el ID real del usuario logueado en Firebase
+            val currentUserId = firebaseManager.getCurrentUser()?.uid ?: "anonymous"
+
             val plant = Plant(
-                userId = "current_user_id", // TODO: Obtener del Auth
+                userId = currentUserId, // Guardamos con el ID correcto
                 commonName = state.plantName,
                 plantType = state.plantType,
                 sunAmount = state.sunAmount,
@@ -118,6 +118,7 @@ class PlantFormViewModel @Inject constructor(
         }
     }
 
+    // --- Funciones para Edición ---
     fun setStep(step: Int) {
         _uiState.update { it.copy(currentStep = step) }
     }
@@ -129,7 +130,10 @@ class PlantFormViewModel @Inject constructor(
                     it.copy(
                         plantName = details.plant.commonName,
                         plantType = details.plant.plantType,
-                        // ... mapear resto de campos Info
+                        sunAmount = details.plant.sunAmount,
+                        waterAmount = details.plant.waterAmount,
+                        soilType = details.plant.soilType,
+                        imageUri = details.plant.imageUrl,
                         careList = details.cares,
                         reminderList = details.reminders
                     )
@@ -141,18 +145,20 @@ class PlantFormViewModel @Inject constructor(
     fun saveEditedSection(plantId: Int, section: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
             val state = _uiState.value
+            // Mantenemos el ID de usuario original al editar (o podrías validarlo)
+            val currentUserId = firebaseManager.getCurrentUser()?.uid ?: "anonymous"
+
             when (section) {
                 0 -> { // Info Básica
                     val updatedPlant = Plant(
                         id = plantId,
-                        userId = "user", // Mantener ID original
+                        userId = currentUserId, // Aseguramos mantener el usuario
                         commonName = state.plantName,
                         plantType = state.plantType,
                         sunAmount = state.sunAmount,
                         waterAmount = state.waterAmount,
                         soilType = state.soilType,
                         imageUrl = state.imageUri
-                        // createdAt se mantiene, updatedAt se debería actualizar
                     )
                     repository.updatePlant(updatedPlant)
                 }
