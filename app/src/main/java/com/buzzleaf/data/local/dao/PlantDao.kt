@@ -3,12 +3,17 @@ package com.buzzleaf.data.local.dao
 import androidx.room.*
 import com.buzzleaf.data.local.entities.Plant
 import kotlinx.coroutines.flow.Flow
+import com.buzzleaf.data.local.entities.PlantWithDetails
 
 @Dao
 interface PlantDao {
 
-    @Query("SELECT * FROM plants WHERE userId = :userId ORDER BY updatedAt DESC")
-    fun getAllPlants(userId: String): Flow<List<Plant>>
+    @Query("SELECT * FROM plants ORDER BY createdAt DESC")
+    fun getAllPlants(): Flow<List<Plant>>
+
+    @Transaction
+    @Query("SELECT * FROM plants WHERE id = :plantId")
+    fun getPlantWithDetails(plantId: Int): Flow<PlantWithDetails>
 
     @Query("SELECT * FROM plants WHERE id = :plantId")
     fun getPlantById(plantId: Int): Flow<Plant?>
