@@ -25,6 +25,10 @@ interface ReminderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertReminders(reminders: List<Reminder>)
 
+    // Esta es la función que faltaba
+    @Query("DELETE FROM reminders WHERE plantId = :plantId")
+    suspend fun deleteRemindersByPlantId(plantId: Int)
+
     @Update
     suspend fun updateReminder(reminder: Reminder)
 
