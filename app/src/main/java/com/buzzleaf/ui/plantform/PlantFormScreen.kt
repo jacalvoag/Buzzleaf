@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -34,7 +33,7 @@ fun PlantFormScreen(
     LaunchedEffect(plantId, mode) {
         if (mode == "EDIT" && plantId != null) {
             viewModel.loadPlantForEditing(plantId)
-            viewModel.setStep(startPage) // Forzar ir a la página específica
+            viewModel.setStep(startPage)
         }
     }
 
@@ -60,14 +59,45 @@ fun PlantFormScreen(
             )
         },
         bottomBar = {
-            // Barra inferior diferente según el modo
+            // [CORRECCIÓN AQUÍ] Restauramos la lógica para mostrar los botones
             if (mode == "CREATE") {
-                // ... (Tu lógica existente de navegación Next/Prev) ...
-                Row( /* ... */ ) {
-                    // ... Botones Anterior / Siguiente ...
+                // Barra de navegación para el Wizard (Paso a paso)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Botón Anterior (Solo visible si no es el primer paso)
+                    if (uiState.currentStep > 0) {
+                        OutlinedButton(
+                            onClick = { viewModel.previousStep() },
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenPrimary)
+                        ) {
+                            Text("Anterior")
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(8.dp)) // Espaciador para mantener el layout
+                    }
+
+                    // Botón Siguiente o Guardar
+                    Button(
+                        onClick = {
+                            if (uiState.currentStep < 2) {
+                                viewModel.nextStep()
+                            } else {
+                                viewModel.savePlant {
+                                    navController.popBackStack()
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
+                    ) {
+                        Text(if (uiState.currentStep == 2) "Guardar" else "Siguiente")
+                    }
                 }
             } else {
-                // MODO EDICIÓN: Solo botón de guardar esa sección
+                // MODO EDICIÓN: Solo botón de guardar esa sección específica
                 Button(
                     onClick = {
                         viewModel.saveEditedSection(plantId!!, startPage) {
@@ -91,9 +121,7 @@ fun PlantFormScreen(
                 StepIndicator(currentStep = uiState.currentStep)
             }
 
-            // Mostrar el contenido.
-            // Si es CREATE, usa uiState.currentStep.
-            // Si es EDIT, usa startPage directamente (ya que no navegamos).
+            // Seleccionar contenido
             val stepToShow = if (mode == "CREATE") uiState.currentStep else startPage
 
             when (stepToShow) {
