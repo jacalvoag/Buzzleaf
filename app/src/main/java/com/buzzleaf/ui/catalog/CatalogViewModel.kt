@@ -18,27 +18,6 @@ class CatalogViewModel @Inject constructor(
     private val firebaseManager: FirebaseManager
 ) : ViewModel() {
 
-    fun savePlant(onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            val state = _uiState.value
-
-            val currentUserId = firebaseManager.getCurrentUser()?.uid ?: "anonymous"
-
-            val plant = Plant(
-                userId = currentUserId,
-                commonName = state.plantName,
-                plantType = state.plantType,
-                sunAmount = state.sunAmount,
-                waterAmount = state.waterAmount,
-                soilType = state.soilType,
-                imageUrl = state.imageUri
-            )
-
-            repository.savePlantWithDetails(plant, state.careList, state.reminderList)
-            onSuccess()
-        }
-    }
-
     val plants: StateFlow<List<Plant>> = repository.getAllPlants()
         .stateIn(
             scope = viewModelScope,
