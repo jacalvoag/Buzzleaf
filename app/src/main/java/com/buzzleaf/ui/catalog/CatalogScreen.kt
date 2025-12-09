@@ -3,8 +3,11 @@ package com.buzzleaf.ui.catalog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -22,6 +25,7 @@ import com.buzzleaf.ui.theme.*
 import com.buzzleaf.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle // O collectAsState normal
+import com.buzzleaf.ui.catalog.components.PlantCard
 
 @Composable
 fun CatalogScreen(
