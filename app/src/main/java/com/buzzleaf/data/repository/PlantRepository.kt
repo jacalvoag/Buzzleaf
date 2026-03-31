@@ -31,6 +31,10 @@ class PlantRepository @Inject constructor(
         reminderDao.insertReminders(remindersWithId)
     }
 
+    suspend fun deletePlant(plant: Plant) {
+        plantDao.deletePlant(plant)
+    }
+
     suspend fun updatePlant(plant: Plant) = plantDao.updatePlant(plant)
 
     suspend fun updateCares(plantId: Int, newCares: List<Care>) {

@@ -2,7 +2,7 @@ package com.buzzleaf.ui.plantdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.buzzleaf.data.local.entities.PlantWithDetails // [IMPORTANTE] Asegura este import
+import com.buzzleaf.data.local.entities.PlantWithDetails
 import com.buzzleaf.data.repository.PlantRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,9 +29,15 @@ class PlantDetailViewModel @Inject constructor(
             }
         }
     }
+
+    fun deletePlant(plant: com.buzzleaf.data.local.entities.Plant, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            repository.deletePlant(plant)
+            onSuccess()
+        }
+    }
 }
 
-// [IMPORTANTE] Esta clase debe estar aquí para que el Screen la reconozca
 data class PlantDetailUiState(
     val plantDetails: PlantWithDetails? = null
 )

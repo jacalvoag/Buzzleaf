@@ -27,10 +27,11 @@ import coil.request.ImageRequest
 import com.buzzleaf.ui.navigation.Screen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue // Para usar 'by'
-import com.buzzleaf.data.local.entities.PlantWithDetails // Si es necesario referenciarlo explícitamente
+import androidx.compose.runtime.getValue
+import com.buzzleaf.data.local.entities.PlantWithDetails
 import com.buzzleaf.ui.theme.GreenPrimary
 import com.buzzleaf.ui.theme.PhilosopherFont
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
 fun PlantDetailScreen(
@@ -38,13 +39,14 @@ fun PlantDetailScreen(
     plantId: Int,
     viewModel: PlantDetailViewModel = hiltViewModel()
 ) {
-    // Cargar datos al iniciar
+
     LaunchedEffect(plantId) {
         viewModel.loadPlant(plantId)
     }
 
     val uiState by viewModel.uiState.collectAsState()
     val plant = uiState.plantDetails?.plant
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     if (plant == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -53,13 +55,38 @@ fun PlantDetailScreen(
         return
     }
 
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Eliminar Planta") },
+            text = { Text("¿Estás seguro de que quieres eliminar a ${plant.commonName}? Esta acción no se puede deshacer.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deletePlant(plant) {
+                            navController.popBackStack()
+                        }
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Eliminar", color = Color.Red, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar")
+                }
+            },
+            containerColor = Color.White
+        )
+    }
+
     Scaffold { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            // --- Header con Imagen ---
             Box(modifier = Modifier.height(300.dp).fillMaxWidth()) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -69,7 +96,6 @@ fun PlantDetailScreen(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
-                // Botón atrás
                 IconButton(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier
@@ -81,11 +107,25 @@ fun PlantDetailScreen(
                 }
             }
 
+            IconButton(
+                onClick = { showDeleteDialog = true },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .statusBarsPadding()
+                    .align(Alignment.TopEnd as Alignment.Horizontal)
+                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Eliminar",
+                    tint = Color(0xFFB71C1C)
+                )
+            }
+
             Column(modifier = Modifier.padding(24.dp)) {
 
-                // --- Sección: Información Básica ---
+
                 SectionHeader(title = "Información Básica") {
-                    // Navegar al Formulario en modo EDIT, página 0 (Info)
                     navController.navigate(
                         Screen.PlantForm.createRoute(plantId = plant.id, mode = "EDIT", startPage = 0)
                     )
@@ -100,9 +140,7 @@ fun PlantDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- Sección: Cuidados ---
                 SectionHeader(title = "Cuidados") {
-                    // Navegar al Formulario en modo EDIT, página 1 (Cuidados)
                     navController.navigate(
                         Screen.PlantForm.createRoute(plantId = plant.id, mode = "EDIT", startPage = 1)
                     )
@@ -113,9 +151,7 @@ fun PlantDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- Sección: Recordatorios ---
                 SectionHeader(title = "Recordatorios") {
-                    // Navegar al Formulario en modo EDIT, página 2 (Recordatorios)
                     navController.navigate(
                         Screen.PlantForm.createRoute(plantId = plant.id, mode = "EDIT", startPage = 2)
                     )
